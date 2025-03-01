@@ -1,0 +1,31 @@
+import requests
+import os
+from dotenv import load_dotenv
+
+# Load API keys from .env file
+load_dotenv()
+BEARER_TOKEN = os.getenv("BEARER_TOKEN")
+
+# Function to get recent tweets from a user
+def get_user_tweets(username, max_results=5):
+    url = f"https://api.twitter.com/2/tweets/search/recent?query=from:{username}&max_results={max_results}"
+    headers = {"Authorization": f"Bearer {BEARER_TOKEN}"}
+
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        print(f"Error: {response.status_code}", response.json())
+        return []
+
+    data = response.json()
+    return data.get("data", [])
+
+if __name__ == "__main__":
+    username = input("Enter X username (without @): ")
+    tweets = get_user_tweets(username)
+
+    if not tweets:
+        print("No tweets found or error occurred.")
+    else:
+        print(f"Recent tweets by @{username}:")
+        for tweet in tweets:
+            print(f"- {tweet['text']}")
